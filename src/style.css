@@ -1,0 +1,260 @@
+:root {
+  /* Morandi color palette */
+  --color-primary: #46A993;
+  --color-primary-light: #6BBFB0;
+  --color-primary-dark: #357D6E;
+  --color-accent-orange: #F0A04B;
+  --color-accent-purple: #C4A0D0;
+  --color-accent-blue: #6DAEDB;
+  --color-accent-soft: #B0A993;
+
+  /* Light theme */
+  --bg-page: #F5F7F6;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #FAFBFA;
+  --bg-subtle: #EEF2F0;
+  --text-primary: #2D3436;
+  --text-secondary: #636E72;
+  --text-tertiary: #95A5A6;
+  --border-color: #E4E9E7;
+  --shadow-soft: 0 2px 12px rgba(70, 169, 147, 0.08);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.04);
+  --radius-card: 16px;
+  --radius-sm: 8px;
+  --success: #46A993;
+  --warning: #F0A04B;
+  --danger: #E08585;
+  --info: #6DAEDB;
+
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html.dark {
+  --bg-page: #1A1E1D;
+  --bg-card: #252B2A;
+  --bg-card-hover: #2D3433;
+  --bg-subtle: #1E2423;
+  --text-primary: #D5DCDB;
+  --text-secondary: #95A5A6;
+  --text-tertiary: #636E72;
+  --border-color: #353C3B;
+  --shadow-soft: 0 2px 12px rgba(0, 0, 0, 0.2);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.15);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+/* Element Plus overrides for Morandi theme */
+.el-button--primary {
+  --el-button-bg-color: var(--color-primary);
+  --el-button-border-color: var(--color-primary);
+  --el-button-hover-bg-color: var(--color-primary-light);
+  --el-button-hover-border-color: var(--color-primary-light);
+  --el-button-active-bg-color: var(--color-primary-dark);
+  --el-button-active-border-color: var(--color-primary-dark);
+}
+
+.el-card {
+  border-radius: var(--radius-card) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: var(--shadow-card) !important;
+  background: var(--bg-card) !important;
+  transition: all 0.3s ease;
+}
+
+.el-card:hover {
+  box-shadow: var(--shadow-soft) !important;
+}
+
+.el-dialog {
+  border-radius: var(--radius-card) !important;
+  background: var(--bg-card) !important;
+}
+
+.el-drawer {
+  border-radius: 16px 16px 0 0 !important;
+  background: var(--bg-card) !important;
+}
+
+.bill-date-popper {
+  z-index: 3000 !important;
+}
+
+@media (max-width: 768px) {
+  .bill-date-popper {
+    max-width: calc(100vw - 16px) !important;
+  }
+
+  .bill-date-popper .el-picker-panel {
+    width: calc(100vw - 32px) !important;
+    min-width: 0 !important;
+  }
+
+  .bill-date-popper .el-date-range-picker {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .bill-date-popper .el-date-range-picker__content {
+    width: 50% !important;
+    min-width: 0 !important;
+    padding: 16px 8px !important;
+  }
+
+  .bill-date-popper .el-date-range-picker__content .el-date-table {
+    width: 100% !important;
+  }
+}
+
+.el-input__wrapper {
+  border-radius: var(--radius-sm) !important;
+}
+
+.el-select__wrapper {
+  border-radius: var(--radius-sm) !important;
+}
+
+.el-table {
+  background: transparent !important;
+  --el-table-border-color: var(--border-color);
+  --el-table-header-bg-color: var(--bg-subtle);
+  --el-table-row-hover-bg-color: var(--bg-card-hover);
+  --el-table-tr-bg-color: transparent;
+  --el-table-bg-color: transparent;
+}
+
+.el-table th.el-table__cell {
+  background-color: var(--bg-subtle) !important;
+  color: var(--text-secondary) !important;
+  font-weight: 500;
+}
+
+.el-table tr {
+  background-color: var(--bg-card) !important;
+}
+
+.el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell {
+  background: var(--bg-subtle) !important;
+}
+
+.el-menu {
+  border-right: none !important;
+  background: transparent !important;
+}
+
+.el-menu-item {
+  border-radius: var(--radius-sm);
+  margin: 4px 8px;
+}
+
+.el-menu-item.is-active {
+  background: rgba(70, 169, 147, 0.1) !important;
+  color: var(--color-primary) !important;
+}
+
+.el-progress-bar__outer {
+  border-radius: 8px !important;
+}
+
+.el-tag {
+  border-radius: 6px !important;
+}
+
+/* Skeleton loading */
+.skeleton-line {
+  background: linear-gradient(90deg, var(--bg-subtle) 25%, var(--bg-card-hover) 50%, var(--bg-subtle) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-tertiary);
+}
+
+.empty-state .empty-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.4;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+/* Utility */
+.page-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+}
+
+.color-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .page-container {
+    padding: 16px;
+    padding-bottom: 80px;
+  }
+  .page-title {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+}
