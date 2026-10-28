@@ -472,7 +472,7 @@ onMounted(async () => {
           <div class="mbc-left">
             <el-checkbox
               :model-value="selectedIds.includes(row.id)"
-              @change="(v) => handleMobileSelect(row.id, v)"
+              @change="(v: string | number) => handleMobileSelect(row.id, v)"
               class="mbc-check"
             />
             <span class="mbc-color-dot" :style="{ background: getCategoryColor(row.category_id) }"></span>
