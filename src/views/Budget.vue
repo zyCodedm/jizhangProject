@@ -112,6 +112,13 @@ async function handleSave() {
     ElMessage.warning('预算金额必须大于0')
     return
   }
+  const conflict = budgets.value.some(
+    (b) => b.id !== form.id && b.month === form.month && (b.category_id || '') === (form.category_id || '')
+  )
+  if (conflict) {
+    ElMessage.warning(form.category_id ? '该月份此分类已设置预算' : '该月份已设置总预算')
+    return
+  }
   saving.value = true
   const payload = {
     month: form.month,
@@ -131,7 +138,8 @@ async function handleSave() {
     dialogVisible.value = false
     await fetchBudgets()
   } catch (err: any) {
-    ElMessage.error(err.message || '操作失败')
+    const message = err?.code === '23505' ? '该月份已存在相同分类的预算' : err?.message || '操作失败'
+    ElMessage.error(message)
   } finally {
     saving.value = false
   }

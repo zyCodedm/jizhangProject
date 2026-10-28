@@ -5,6 +5,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { supabase, type Bill } from '../lib/supabase'
 import { useDataStore } from '../stores/data'
 import { formatCurrency } from '../utils/format'
+import BillForm from '../components/BillForm.vue'
 import dayjs from 'dayjs'
 
 const dataStore = useDataStore()
@@ -178,7 +179,12 @@ function openEdit(bill: Bill) {
 }
 
 async function handleSave() {
-  const valid = await formRef.value?.validate()
+  let valid = false
+  try {
+    valid = !!(await formRef.value?.validate())
+  } catch {
+    valid = false
+  }
   if (!valid) return
   saving.value = true
   const payload = {
