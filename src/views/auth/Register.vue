@@ -3,6 +3,7 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from '../../stores/auth'
+import { errorText } from '../../utils/error'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -47,7 +48,7 @@ async function handleSubmit() {
       ElMessage.success('注册成功，请登录')
       router.push('/login')
     } catch (err: any) {
-      ElMessage.error(err.message || '注册失败')
+      ElMessage.error(errorText(err, '注册失败'))
     } finally {
       loading.value = false
     }

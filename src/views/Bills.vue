@@ -5,6 +5,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { supabase, type Bill } from '../lib/supabase'
 import { useDataStore } from '../stores/data'
 import { formatCurrency } from '../utils/format'
+import { errorText } from '../utils/error'
 import BillForm from '../components/BillForm.vue'
 import dayjs from 'dayjs'
 
@@ -211,7 +212,7 @@ async function handleSave() {
     dialogVisible.value = false
     await fetchBills()
   } catch (err: any) {
-    ElMessage.error(err.message || '操作失败')
+    ElMessage.error(errorText(err, '操作失败'))
   } finally {
     saving.value = false
   }
@@ -229,7 +230,7 @@ async function handleDelete(bill: Bill) {
     ElMessage.success('删除成功')
     await fetchBills()
   } catch (err: any) {
-    if (err !== 'cancel') ElMessage.error(err.message || '删除失败')
+    if (err !== 'cancel') ElMessage.error(errorText(err, '删除失败'))
   }
 }
 
@@ -250,12 +251,20 @@ async function handleBatchDelete() {
     selectedIds.value = []
     await fetchBills()
   } catch (err: any) {
-    if (err !== 'cancel') ElMessage.error(err.message || '删除失败')
+    if (err !== 'cancel') ElMessage.error(errorText(err, '删除失败'))
   }
 }
 
 function handleSelectionChange(rows: Bill[]) {
   selectedIds.value = rows.map((r) => r.id)
+}
+
+function handleMobileSelect(id: string, checked: boolean) {
+  if (checked) {
+    if (!selectedIds.value.includes(id)) selectedIds.value.push(id)
+  } else {
+    selectedIds.value = selectedIds.value.filter((x) => x !== id)
+  }
 }
 
 function handlePageChange(p: number) {
@@ -384,8 +393,8 @@ onMounted(async () => {
       </div>
     </el-card>
 
-    <!-- Bills table -->
-    <el-card style="margin-top: 16px;">
+    <!-- Bills table (desktop) -->
+    <el-card v-if="!isMobile" style="margin-top: 16px;">
       <el-table
         v-loading="loading"
         :data="bills"
@@ -456,6 +465,70 @@ onMounted(async () => {
       </div>
     </el-card>
 
+    <!-- Bills card list (mobile) -->
+    <div v-else style="margin-top: 16px;">
+      <div v-loading="loading" class="mobile-bill-list">
+        <div v-for="row in bills" :key="row.id" class="mobile-bill-card">
+          <div class="mbc-left">
+            <el-checkbox
+              :model-value="selectedIds.includes(row.id)"
+              @change="(v) => handleMobileSelect(row.id, v)"
+              class="mbc-check"
+            />
+            <span class="mbc-color-dot" :style="{ background: getCategoryColor(row.category_id) }"></span>
+          </div>
+          <div class="mbc-body">
+            <div class="mbc-row-top">
+              <div class="mbc-cat">{{ getCategoryName(row.category_id) }}</div>
+              <div
+                class="mbc-amount"
+                :style="{ color: row.type === 'income' ? '#46A993' : row.type === 'expense' ? '#F0A04B' : '#636E72' }"
+              >
+                {{ row.type === 'income' ? '+' : row.type === 'expense' ? '-' : '' }}{{ formatCurrency(Number(row.amount)) }}
+              </div>
+            </div>
+            <div class="mbc-row-sub">
+              <el-tag
+                :type="row.type === 'income' ? 'success' : row.type === 'expense' ? 'warning' : 'info'"
+                size="small"
+                effect="light"
+                style="margin-right: 6px;"
+              >
+                {{ row.type === 'income' ? '收入' : row.type === 'expense' ? '支出' : '转账' }}
+              </el-tag>
+              <span class="mbc-date">{{ row.bill_date }}</span>
+              <span class="mbc-ledger">· {{ getLedgerName(row.ledger_id) }}</span>
+            </div>
+            <div v-if="row.note" class="mbc-note">{{ row.note }}</div>
+            <div v-if="row.tag_ids?.length" class="mbc-tags">
+              <el-tag v-for="tid in row.tag_ids" :key="tid" size="small" effect="plain" style="margin-right: 4px;">
+                {{ getTagName(tid) }}
+              </el-tag>
+            </div>
+          </div>
+          <div class="mbc-actions">
+            <el-button text type="primary" size="small" @click="openEdit(row)">编辑</el-button>
+            <el-button text type="danger" size="small" @click="handleDelete(row)">删除</el-button>
+          </div>
+        </div>
+
+        <div v-if="!loading && bills.length === 0" class="empty-state">
+          <el-icon class="empty-icon"><Tickets /></el-icon>
+          <p>暂无账单，点击右上角新增</p>
+        </div>
+      </div>
+
+      <div v-if="total > pageSize" style="margin-top: 16px; display: flex; justify-content: center;">
+        <el-pagination
+          layout="prev, pager, next"
+          :total="total"
+          :page-size="pageSize"
+          :current-page="page"
+          @current-change="handlePageChange"
+        />
+      </div>
+    </div>
+
     <!-- Add/Edit Dialog -->
     <el-dialog
       v-model="dialogVisible"
@@ -520,6 +593,108 @@ onMounted(async () => {
 }
 .filter-actions .el-button {
   margin-left: 0;
+}
+
+/* Mobile bill card list */
+.mobile-bill-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.mobile-bill-card {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  background: var(--el-bg-color);
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 10px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.15s;
+}
+.mobile-bill-card:active {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+.mbc-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.mbc-check {
+  margin-right: 0 !important;
+}
+.mbc-color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.mbc-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+}
+.mbc-row-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.mbc-cat {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--el-text-color-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mbc-amount {
+  font-weight: 700;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+.mbc-row-sub {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+}
+.mbc-date {
+  font-variant-numeric: tabular-nums;
+}
+.mbc-ledger {
+  color: var(--el-text-color-placeholder);
+}
+.mbc-note {
+  font-size: 13px;
+  color: var(--el-text-color-regular);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.mbc-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.mbc-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
 }
 
 @media (max-width: 768px) {

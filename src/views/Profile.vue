@@ -4,6 +4,7 @@ import { ElMessage } from 'element-plus'
 import { useAuthStore } from '../stores/auth'
 import { useThemeStore } from '../stores/theme'
 import { supabase } from '../lib/supabase'
+import { errorText } from '../utils/error'
 
 const auth = useAuthStore()
 const theme = useThemeStore()
@@ -48,7 +49,7 @@ async function handleSaveProfile() {
     })
     ElMessage.success('保存成功')
   } catch (err: any) {
-    ElMessage.error(err.message || '保存失败')
+    ElMessage.error(errorText(err, '保存失败'))
   } finally {
     saving.value = false
   }
@@ -70,7 +71,7 @@ async function handleChangePassword() {
     passwordForm.newPassword = ''
     passwordForm.confirmPassword = ''
   } catch (err: any) {
-    ElMessage.error(err.message || '修改失败')
+    ElMessage.error(errorText(err, '修改失败'))
   } finally {
     changingPassword.value = false
   }

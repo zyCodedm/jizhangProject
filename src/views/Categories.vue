@@ -3,6 +3,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { supabase, type Category } from '../lib/supabase'
 import { useDataStore } from '../stores/data'
+import { errorText } from '../utils/error'
 
 const dataStore = useDataStore()
 const loading = ref(true)
@@ -98,7 +99,7 @@ async function handleSave() {
     dialogVisible.value = false
     await fetchCategories()
   } catch (err: any) {
-    ElMessage.error(err.message || '操作失败')
+    ElMessage.error(errorText(err, '操作失败'))
   } finally {
     saving.value = false
   }
@@ -116,7 +117,7 @@ async function handleDelete(cat: Category) {
     ElMessage.success('删除成功')
     await fetchCategories()
   } catch (err: any) {
-    if (err !== 'cancel') ElMessage.error(err.message || '删除失败')
+    if (err !== 'cancel') ElMessage.error(errorText(err, '删除失败'))
   }
 }
 

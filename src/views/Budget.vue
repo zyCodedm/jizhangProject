@@ -4,6 +4,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { supabase, type Budget } from '../lib/supabase'
 import { useDataStore } from '../stores/data'
 import { formatCurrency } from '../utils/format'
+import { errorText } from '../utils/error'
 import dayjs from 'dayjs'
 
 const dataStore = useDataStore()
@@ -138,7 +139,7 @@ async function handleSave() {
     dialogVisible.value = false
     await fetchBudgets()
   } catch (err: any) {
-    const message = err?.code === '23505' ? '该月份已存在相同分类的预算' : err?.message || '操作失败'
+    const message = err?.code === '23505' ? '该月份已存在相同分类的预算' : errorText(err, '操作失败')
     ElMessage.error(message)
   } finally {
     saving.value = false
@@ -157,7 +158,7 @@ async function handleDelete(b: Budget) {
     ElMessage.success('删除成功')
     await fetchBudgets()
   } catch (err: any) {
-    if (err !== 'cancel') ElMessage.error(err.message || '删除失败')
+    if (err !== 'cancel') ElMessage.error(errorText(err, '删除失败'))
   }
 }
 

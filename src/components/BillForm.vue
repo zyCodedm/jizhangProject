@@ -63,7 +63,7 @@ defineExpose({
     </el-form-item>
     <el-form-item v-if="form.type !== 'transfer'" label="分类" prop="category_id">
       <el-select v-model="form.category_id" placeholder="请选择分类" style="width: 100%;" clearable>
-        <el-option v-for="c in categories" :key="c.id" :value="c.id">
+        <el-option v-for="c in categories" :key="c.id" :value="c.id" :label="c.name">
           <span style="display: flex; align-items: center; gap: 6px;">
             <span class="color-dot" :style="{ background: c.color }"></span>
             {{ c.name }}
